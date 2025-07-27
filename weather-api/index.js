@@ -1,30 +1,42 @@
-const apiKey = 'YOUR_API_KEY';
-const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
+// Declaring the variables
+let lon;
+let lat;
+let temperature = document.querySelector(".temp");
+let summary = document.querySelector(".summary");
+let loc = document.querySelector(".location");
+let icon = document.querySelector(".icon");
+const kelvin = 273;
 
-const locationInput = document.getElementById('locationInput');
-const searchButton = document.getElementById('searchButton');
-const locationElement = document.getElementById('location');
-const temperatureElement = document.getElementById('temperature');
-const descriptionElement = document.getElementById('description');
+window.addEventListener("load", () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log(position);
+      lon = position.coords.longitude;
+      lat = position.coords.latitude;
 
-searchButton.addEventListener('click', () => {
-    const location = locationInput.value;
-    if (location) {
-        fetchWeather(location);
-    }
-});
+      // API ID
+      const api = "6d055e39ee237af35ca066f35474e9df";
 
-function fetchWeather(location) {
-    const url = `${apiUrl}?q=${location}&appid=${apiKey}&units=metric`;
+      // API URL
+      const base =
+`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&` +
+`lon=${lon}&appid=6d055e39ee237af35ca066f35474e9df`;
 
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            locationElement.textContent = data.name;
-            temperatureElement.textContent = `${Math.round(data.main.temp)}°C`;
-            descriptionElement.textContent = data.weather[0].description;
+      // Calling the API
+      fetch(base)
+        .then((response) => {
+          return response.json();
         })
-        .catch(error => {
-            console.error('Error fetching weather data:', error);
+        .then((data) => {
+          console.log(data);
+          temperature.textContent = 
+              Math.floor(data.main.temp - kelvin) + "°C";
+          summary.textContent = data.weather[0].description;
+          loc.textContent = data.name + "," + data.sys.country;
+          let icon1 = data.weather[0].icon;
+          icon.innerHTML = 
+              `<img src="icons/${icon1}.svg" style= 'height:10rem'/>`;
         });
-}
+    });
+  }
+});
